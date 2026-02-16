@@ -2,8 +2,10 @@ import { assets, categories } from "../../assets/assets";
 import { useContext, useState } from "react";
 import { AppContext } from "../../context/appContext";
 import toast from "react-hot-toast";
+
 const AddProduct = () => {
-  const { axios } = useContext(AppContext);
+  const { setProducts, products } = useContext(AppContext);
+
   const [files, setFiles] = useState([]);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
@@ -12,9 +14,11 @@ const AddProduct = () => {
   const [offerPrice, setOfferPrice] = useState("");
 
   const handleSubmit = async (e) => {
-    try {
-      e.preventDefault();
+    e.preventDefault();
 
+    try {
+      // ---------------- BACKEND (COMMENTED) ----------------
+      /*
       const formData = new FormData();
       formData.append("name", name);
       formData.append("description", description);
@@ -26,142 +30,159 @@ const AddProduct = () => {
         formData.append("image", files[i]);
       }
 
-      const { data } = await axios.post("/api/product/add-product", formData);
-      if (data.success) {
-        toast.success(data.message);
-        setName("");
-        setDescription("");
-        setCategory("");
-        setPrice("");
-        setOfferPrice("");
-        setFiles([]);
-      } else {
-        toast.error(data.message);
-      }
+      const { data } = await axios.post(
+        "/api/product/add-product",
+        formData
+      );
+      */
+
+      // ---------------- FRONTEND ADD ----------------
+
+      const newProduct = {
+        _id: Date.now().toString(), // unique id
+        name,
+        description,
+        category,
+        price: Number(price),
+        offerPrice: Number(offerPrice),
+        image: files.map((file) =>
+          URL.createObjectURL(file)
+        ),
+        inStock: true,
+      };
+
+      setProducts((prev) => [...prev, newProduct]);
+
+      toast.success("Product Added");
+
+      // reset form
+      setName("");
+      setDescription("");
+      setCategory("");
+      setPrice("");
+      setOfferPrice("");
+      setFiles([]);
     } catch (error) {
-      toast.error(error.message);
+      console.log(error.message);
     }
   };
 
   return (
     <div className="py-10 flex flex-col justify-between bg-white">
-      <form onSubmit={handleSubmit} className="md:p-10 p-4 space-y-5 max-w-lg">
+      <form
+        onSubmit={handleSubmit}
+        className="md:p-10 p-4 space-y-5 max-w-lg"
+      >
+        {/* IMAGE UPLOAD */}
         <div>
-          <p className="text-base font-medium">Product Image</p>
+          <p className="text-base font-medium">
+            Product Image
+          </p>
+
           <div className="flex flex-wrap items-center gap-3 mt-2">
             {Array(4)
               .fill("")
               .map((_, index) => (
-                <label key={index} htmlFor={`image${index}`}>
+                <label key={index}>
                   <input
                     onChange={(e) => {
-                      const updatedFiles = [...files];
-                      updatedFiles[index] = e.target.files[0];
-                      setFiles(updatedFiles);
+                      const updated = [...files];
+                      updated[index] =
+                        e.target.files[0];
+                      setFiles(updated);
                     }}
-                    accept="image/*"
                     type="file"
-                    id={`image${index}`}
                     hidden
                   />
+
                   <img
                     className="max-w-24 cursor-pointer"
                     src={
                       files[index]
-                        ? URL.createObjectURL(files[index])
+                        ? URL.createObjectURL(
+                            files[index]
+                          )
                         : assets.upload_area
                     }
-                    alt="uploadArea"
-                    width={100}
-                    height={100}
+                    alt=""
                   />
                 </label>
               ))}
           </div>
         </div>
-        <div className="flex flex-col gap-1 max-w-md">
-          <label className="text-base font-medium" htmlFor="product-name">
-            Product Name
-          </label>
-          <input
-            id="product-name"
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Type here"
-            className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-            required
-          />
-        </div>
-        <div className="flex flex-col gap-1 max-w-md">
-          <label
-            className="text-base font-medium"
-            htmlFor="product-description"
-          >
-            Product Description
-          </label>
-          <textarea
-            id="product-description"
-            rows={4}
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40 resize-none"
-            placeholder="Type here"
-          ></textarea>
-        </div>
-        <div className="w-full flex flex-col gap-1">
-          <label className="text-base font-medium" htmlFor="category">
-            Category
-          </label>
-          <select
-            id="category"
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-          >
-            <option value="">Select Category</option>
-            {categories.map((category, index) => (
-              <option value={category.path} key={index}>
-                {category.path}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="flex items-center gap-5 flex-wrap">
-          <div className="flex-1 flex flex-col gap-1 w-32">
-            <label className="text-base font-medium" htmlFor="product-price">
-              Product Price
-            </label>
-            <input
-              id="product-price"
-              type="number"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              placeholder="0"
-              className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-              required
-            />
-          </div>
-          <div className="flex-1 flex flex-col gap-1 w-32">
-            <label className="text-base font-medium" htmlFor="offer-price">
-              Offer Price
-            </label>
-            <input
-              id="offer-price"
-              type="number"
-              value={offerPrice}
-              onChange={(e) => setOfferPrice(e.target.value)}
-              placeholder="0"
-              className="outline-none md:py-2.5 py-2 px-3 rounded border border-gray-500/40"
-              required
-            />
-          </div>
-        </div>
-        <button className="px-8 py-2.5 bg-indigo-500 text-white font-medium rounded">
-          ADD
+
+        {/* NAME */}
+        <input
+          type="text"
+          value={name}
+          onChange={(e) =>
+            setName(e.target.value)
+          }
+          placeholder="Product Name"
+          className="border p-2 w-full"
+          required
+        />
+
+        {/* DESCRIPTION */}
+        <textarea
+          value={description}
+          onChange={(e) =>
+            setDescription(e.target.value)
+          }
+          placeholder="Description"
+          className="border p-2 w-full"
+        />
+
+        {/* CATEGORY */}
+        <select
+          value={category}
+          onChange={(e) =>
+            setCategory(e.target.value)
+          }
+          className="border p-2 w-full"
+          required
+        >
+          <option value="">
+            Select Category
+          </option>
+
+          {categories.map((cat, i) => (
+            <option key={i} value={cat.path}>
+              {cat.path}
+            </option>
+          ))}
+        </select>
+
+        {/* PRICE */}
+        <input
+          type="number"
+          value={price}
+          onChange={(e) =>
+            setPrice(e.target.value)
+          }
+          placeholder="Price"
+          className="border p-2 w-full"
+          required
+        />
+
+        {/* OFFER PRICE */}
+        <input
+          type="number"
+          value={offerPrice}
+          onChange={(e) =>
+            setOfferPrice(e.target.value)
+          }
+          placeholder="Offer Price"
+          className="border p-2 w-full"
+          required
+        />
+
+        <button className="bg-indigo-500 text-white px-6 py-2">
+          ADD PRODUCT
         </button>
       </form>
     </div>
   );
 };
+
 export default AddProduct;

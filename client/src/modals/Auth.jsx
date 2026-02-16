@@ -1,35 +1,61 @@
 import { useState } from "react";
 import { useAppContext } from "../context/appContext";
 import { toast } from "react-hot-toast";
+
 const Auth = () => {
   const [state, setState] = useState("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { setShowUserLogin, setUser, axios, navigate } = useAppContext();
+
+  const { setShowUserLogin, setUser, navigate } = useAppContext();
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
+
     try {
-      e.preventDefault();
+      // ---------------- BACKEND CALL (COMMENTED) ----------------
+      /*
       const { data } = await axios.post(`/api/user/${state}`, {
         name,
         email,
         password,
       });
+
       if (data.success) {
         toast.success(data.message);
-        navigate("/");
         setUser(data.user);
+        navigate("/");
         setShowUserLogin(false);
       } else {
         toast.error(data.message);
       }
-    } catch (error) {}
+      */
+
+      // ---------------- FRONTEND DEMO LOGIN ----------------
+      const dummyUser = {
+        name: name || "Demo User",
+        email,
+      };
+
+      setUser(dummyUser);
+      toast.success(
+        state === "login"
+          ? "Login Successful"
+          : "Account Created"
+      );
+
+      navigate("/");
+      setShowUserLogin(false);
+    } catch (error) {
+      console.log(error.message);
+    }
   };
+
   return (
     <div
       onClick={() => setShowUserLogin(false)}
-      className="fixed top-0 left-0 bottom-0 right-0 z-30 flex items-center justify-center  bg-black/50 text-gray-600"
+      className="fixed top-0 left-0 bottom-0 right-0 z-30 flex items-center justify-center bg-black/50 text-gray-600"
     >
       <form
         onSubmit={handleSubmit}
@@ -40,6 +66,7 @@ const Auth = () => {
           <span className="text-indigo-500">User</span>{" "}
           {state === "login" ? "Login" : "Register"}
         </p>
+
         {state === "register" && (
           <div className="w-full">
             <p>Name</p>
@@ -53,7 +80,8 @@ const Auth = () => {
             />
           </div>
         )}
-        <div className="w-full ">
+
+        <div className="w-full">
           <p>Email</p>
           <input
             onChange={(e) => setEmail(e.target.value)}
@@ -64,7 +92,8 @@ const Auth = () => {
             required
           />
         </div>
-        <div className="w-full ">
+
+        <div className="w-full">
           <p>Password</p>
           <input
             onChange={(e) => setPassword(e.target.value)}
@@ -75,6 +104,7 @@ const Auth = () => {
             required
           />
         </div>
+
         {state === "register" ? (
           <p>
             Already have account?{" "}
@@ -96,11 +126,15 @@ const Auth = () => {
             </span>
           </p>
         )}
+
         <button className="bg-indigo-500 hover:bg-indigo-600 transition-all text-white w-full py-2 rounded-md cursor-pointer">
-          {state === "register" ? "Create Account" : "Login"}
+          {state === "register"
+            ? "Create Account"
+            : "Login"}
         </button>
       </form>
     </div>
   );
 };
+
 export default Auth;
