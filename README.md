@@ -72,9 +72,20 @@ Farm2Home/
 
 ## 📸 Screenshots
 
-*(Will be added soon)*
+### Home Page
+![Home](screenshots/HomePage.png)
 
----
+### Category Page
+![Cart](screenshots/CategoryPage.png)
+
+### Login Page
+![Login](screenshots/UserloginPage.png)
+
+### All Products Page
+![Login](screenshots/AllProductsPage.png)
+
+### Seller Dashboard Page
+![Login](screenshots/SellerDashBoard.png)
 
 ## ⚙️ Installation & Setup
 
