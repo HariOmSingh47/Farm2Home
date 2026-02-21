@@ -48,7 +48,7 @@ const Navbar = () => {
       {/* LOGO */}
       <Link to="/">
         <h2 className="text-2xl font-bold text-primary">
-          Grocery App
+          Farm2Home App
         </h2>
       </Link>
 
